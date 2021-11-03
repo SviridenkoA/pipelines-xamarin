@@ -51,6 +51,7 @@ jobs:
   - task: NuGetToolInstaller@1
 
   - task: NuGetCommand@2
+    enabled: false
     inputs:
       restoreSolution: '**/*.sln'
 
