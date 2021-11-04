@@ -18,20 +18,13 @@ jobs:
 
   - task: NuGetToolInstaller@1
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Push'
-    inputs:
-      command: 'push'
-      packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-      nuGetFeedType: 'internal'
-      feedsToUse: 'select'
-      vstsFeed: 'your feed'
-      publishVstsFeed: 'your feed'
-      allowPackageConflicts: true
+
   - task: NuGetCommand@2
     enabled: true
     inputs:
+      command: 'restore'
       restoreSolution: '**/*.sln'
+      feedsToUse: 'select'
 
   - task: XamariniOS@2
     inputs:
