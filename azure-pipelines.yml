@@ -1,9 +1,41 @@
 # Xamarin.Android and Xamarin.iOS
 # Build a Xamarin.Android and Xamarin.iOS app.
 # Add steps that test, sign, and distribute the app, save build artifacts, and more:
-# https://docs.microsoft.com/en-us/azure/devops/pipelines/ecosystems/xamarin
+# https://docs.microsoft.com/azure/devops/pipelines/ecosystems/xamarin
 
 jobs:
+
+- job: Android
+  pool:
+    vmImage: 'windows-2019'
+
+  variables:
+    buildConfiguration: 'Release'
+    outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
+
+  steps:
+  - task: NuGetToolInstaller@1
+
+  - task: NuGetCommand@2
+    inputs:
+      restoreSolution: '**/*.sln'
+
+  - task: XamarinAndroid@1
+    inputs:
+      projectFile: '**/*droid*.csproj'
+      outputDirectory: '$(outputDirectory)'
+      configuration: '$(buildConfiguration)'
+      msbuildVersionOption: '16.0'
+
+  - task: AndroidSigning@3
+    inputs:
+      apksign: false
+      zipalign: false
+      apkFiles: '$(outputDirectory)/*.apk'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(outputDirectory)'
 
 - job: iOS
   pool:
@@ -14,17 +46,13 @@ jobs:
   # https://go.microsoft.com/fwlink/?linkid=871629
   - script: sudo $AGENT_HOMEDIRECTORY/scripts/select-xamarin-sdk.sh 5_4_1 
     displayName: 'Select Xamarin SDK version'
-    enabled: true
+    enabled: false
 
   - task: NuGetToolInstaller@1
 
-
   - task: NuGetCommand@2
-    enabled: true
     inputs:
-      command: 'restore'
       restoreSolution: '**/*.sln'
-      feedsToUse: 'select'
 
   - task: XamariniOS@2
     inputs:
